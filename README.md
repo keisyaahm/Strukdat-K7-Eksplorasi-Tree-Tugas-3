@@ -2,7 +2,7 @@
 
 ## Implementasi Quadtree dan PR Quadtree untuk Navigasi Pencarian Slot Parkir Terdekat pada Sistem Smart Parking
 
-## Kelompok 7
+###  Kelompok 7
 | No | NRP | Nama |
 |---|---|---|
 | 1 | 5027251106 | Senna Bagus Harimurti |
@@ -10,12 +10,6 @@
 | 3 | 5027251004 | Ni Putu Maqueenta Wijaya |
 | 4 | 5027251044 | Arrumanta Ekna Luhkinasih |
 | 5 | 5027251068 | Keisya Halimah Mulia |
-
----
-
-# Mata Kuliah
-
-ET234203 Struktur Data dan Pemrograman Berorientasi Objek
 
 ---
 
