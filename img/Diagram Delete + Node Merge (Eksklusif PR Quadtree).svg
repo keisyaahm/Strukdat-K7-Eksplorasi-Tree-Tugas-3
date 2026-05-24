@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 250" width="600" height="250">
+  <defs>
+    <marker id="bigArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#28a745"/>
+    </marker>
+  </defs>
+
+  <text x="150" y="30" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle">Sebelum (Penuh)</text>
+  
+  <circle cx="150" cy="70" r="20" fill="#fff" stroke="#333" stroke-width="2"/>
+  <text x="150" y="75" font-family="Arial" font-size="12" font-weight="bold" text-anchor="middle">Root</text>
+  
+  <line x1="150" y1="90" x2="60" y2="160" stroke="#333" stroke-width="2"/>
+  <line x1="150" y1="90" x2="120" y2="160" stroke="#333" stroke-width="2"/>
+  <line x1="150" y1="90" x2="180" y2="160" stroke="#333" stroke-width="2"/>
+  <line x1="150" y1="90" x2="240" y2="160" stroke="#333" stroke-width="2"/>
+
+  <rect x="45" y="160" width="30" height="30" fill="#fff" stroke="#dc3545" stroke-width="2"/>
+  <line x1="45" y1="160" x2="75" y2="190" stroke="#dc3545" stroke-width="2"/>
+  <line x1="75" y1="160" x2="45" y2="190" stroke="#dc3545" stroke-width="2"/>
+  
+  <rect x="105" y="160" width="30" height="30" fill="#fff" stroke="#dc3545" stroke-width="2"/>
+  <line x1="105" y1="160" x2="135" y2="190" stroke="#dc3545" stroke-width="2"/>
+  <line x1="135" y1="160" x2="105" y2="190" stroke="#dc3545" stroke-width="2"/>
+
+  <rect x="165" y="160" width="30" height="30" fill="#fff" stroke="#dc3545" stroke-width="2"/>
+  <line x1="165" y1="160" x2="195" y2="190" stroke="#dc3545" stroke-width="2"/>
+  <line x1="195" y1="160" x2="165" y2="190" stroke="#dc3545" stroke-width="2"/>
+
+  <rect x="225" y="160" width="30" height="30" fill="#fff" stroke="#28a745" stroke-width="2"/>
+  <text x="240" y="180" font-family="Arial" font-size="10" fill="#28a745" text-anchor="middle">Sisa 1</text>
+
+  <line x1="280" y1="130" x2="360" y2="130" stroke="#28a745" stroke-width="4" marker-end="url(#bigArrow)"/>
+  <text x="320" y="120" font-family="Arial" font-size="16" font-weight="bold" fill="#28a745" text-anchor="middle">MERGE</text>
+
+  <text x="450" y="30" font-family="Arial" font-size="16" font-weight="bold" text-anchor="middle">Setelah (Kosong)</text>
+  
+  <circle cx="450" cy="70" r="20" fill="#fff" stroke="#333" stroke-width="2"/>
+  <text x="450" y="75" font-family="Arial" font-size="12" font-weight="bold" text-anchor="middle">Root</text>
+  
+  <line x1="450" y1="90" x2="450" y2="160" stroke="#333" stroke-width="2"/>
+  
+  <rect x="420" y="160" width="60" height="40" fill="#fff" stroke="#28a745" stroke-width="3"/>
+  <text x="450" y="185" font-family="Arial" font-size="14" font-weight="bold" fill="#28a745" text-anchor="middle">LEAF (1 Titik)</text>
+  <text x="450" y="220" font-family="Arial" font-size="12" fill="#666" text-anchor="middle">Keempat anak lebur</text>
+</svg>
