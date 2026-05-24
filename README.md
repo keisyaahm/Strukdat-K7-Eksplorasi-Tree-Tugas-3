@@ -2,8 +2,6 @@
 
 # Implementasi Quadtree dan PR Quadtree untuk Navigasi Pencarian Slot Parkir Terdekat pada Sistem Smart Parking
 
----
-
 # Daftar Isi
 
 - [Kelompok 7](#kelompok-7)
