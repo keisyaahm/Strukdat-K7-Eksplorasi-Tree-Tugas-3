@@ -1,9 +1,8 @@
 # Strukdat-K7-Eksplorasi-Tree-Tugas-3
 
-# Implementasi Quadtree dan PR Quadtree untuk Navigasi Pencarian Slot Parkir Terdekat pada Sistem Smart Parking
+## Implementasi Quadtree dan PR Quadtree untuk Navigasi Pencarian Slot Parkir Terdekat pada Sistem Smart Parking
 
-# Kelompok 7
-
+## Kelompok 7
 | No | NRP | Nama |
 |---|---|---|
 | 1 | 5027251106 | Senna Bagus Harimurti |
