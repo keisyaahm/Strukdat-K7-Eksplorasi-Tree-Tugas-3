@@ -49,9 +49,7 @@ class Rectangle {
     }
 }
 
-// ================================================================
 // STANDARD QUADTREE (Menggunakan Bucket/Kapasitas Group)
-// ================================================================
 class QuadTree {
     private static final int CAPACITY  = 4; // Node akan split jika data > 4
     private static final int MAX_DEPTH = 20;
@@ -200,9 +198,7 @@ class QuadTree {
     }
 }
 
-// ================================================================
 // PR QUADTREE (Point-Region: Tipe Node Eksplisit & Menggunakan Merge)
-// ================================================================
 class PRQuadTree {
     enum NodeType { EMPTY, LEAF, INTERNAL } // Representasi state node yang jelas
 
@@ -410,15 +406,11 @@ public class Main {
     static Random rng = new Random(42);
 
     public static void main(String[] args) {
-        System.out.println("╔══════════════════════════════════════════════════════╗");
-        System.out.println("║     Parking Slot Management — QuadTree Benchmark     ║");
-        System.out.println("╚══════════════════════════════════════════════════════╝\n");
+        System.out.println("Parking Slot Management — QuadTree Benchmark\n");
 
         functionalDemo();
 
-        System.out.println("\n══════════════════════════════════════════════════════");
-        System.out.println(" PERFORMANCE BENCHMARK");
-        System.out.println("══════════════════════════════════════════════════════");
+        System.out.println("\nPERFORMANCE BENCHMARK");
         printHeader();
         for (int n : SIZES) benchmark(n);
         System.out.println();
@@ -429,9 +421,7 @@ public class Main {
 
     // Menjalankan demonstrasi fitur dasar (Insert, Update, Range Query, Nearest Search, Delete)
     static void functionalDemo() {
-        System.out.println("══════════════════════════════════════════════════════");
-        System.out.println(" FUNCTIONAL DEMO  (N=20 slots)");
-        System.out.println("══════════════════════════════════════════════════════");
+        System.out.println("FUNCTIONAL DEMO  (N=20 slots)");
 
         Rectangle world = new Rectangle(0, 0, WORLD, WORLD);
         PRQuadTree pr = new PRQuadTree(world);
@@ -509,9 +499,7 @@ public class Main {
 
     // Demo untuk melihat berapa banyak node pohon yang harus diperiksa saat pencarian spasial terdekat
     static void nodesVisitedDemo() {
-        System.out.println("\n══════════════════════════════════════════════════════");
-        System.out.println(" NODES VISITED saat nearestAvailable()");
-        System.out.println("══════════════════════════════════════════════════════");
+        System.out.println("\nNODES VISITED saat nearestAvailable()");
         System.out.printf("  %-8s | %-20s | %-18s%n","N","PR QuadTree visited","QuadTree visited");
         System.out.println("  ---------|----------------------|--------------------");
         for (int n : SIZES) {
@@ -528,9 +516,7 @@ public class Main {
 
     // Demo pembuktian efisiensi memori PR QuadTree yang sukses melakukan pemangkasan node kosong (tryMerge)
     static void deleteAndMergeDemo() {
-        System.out.println("\n══════════════════════════════════════════════════════");
-        System.out.println(" DELETE + NODE MERGING (eksklusif PR QuadTree)");
-        System.out.println("══════════════════════════════════════════════════════");
+        System.out.println("\nDELETE + NODE MERGING (eksklusif PR QuadTree)");
 
         Rectangle world = new Rectangle(0, 0, WORLD, WORLD);
         PRQuadTree pr = new PRQuadTree(world);
@@ -542,7 +528,7 @@ public class Main {
         System.out.printf("Setelah insert 100 slot  -> PR nodes: %d   QT nodes: %d%n", prB, qtB);
 
         // Hapus massal data untuk memicu merger node otomatis pada PR QuadTree
-        for (int i=0;i<80;i++){
+        for (int i=0; i<80; i++){
             ParkingSlot s=slots.get(i);
             pr.delete(s.id,s.x,s.y); qt.delete(s.id,s.x,s.y);
         }
@@ -557,7 +543,7 @@ public class Main {
     static List<ParkingSlot> generateSlots(int n) {
         List<ParkingSlot> list = new ArrayList<>();
         Set<String> seen = new HashSet<>();
-        for (int i=0;i<n;i++){
+        for (int i=0; i<n; i++){
             double x,y; String key;
             do {
                 x=rng.nextDouble()*(WORLD-1);
