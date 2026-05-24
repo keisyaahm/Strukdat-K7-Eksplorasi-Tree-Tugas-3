@@ -1,6 +1,5 @@
 # Strukdat-K7-Eksplorasi-Tree-Tugas-3
 
-````md
 # Implementasi Quadtree dan PR Quadtree untuk Navigasi Pencarian Slot Parkir Terdekat pada Sistem Smart Parking
 
 ---
