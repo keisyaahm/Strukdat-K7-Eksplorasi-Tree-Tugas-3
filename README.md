@@ -6,30 +6,32 @@
 
 # Daftar Isi
 
-1. Kelompok
-2. Struktur Laporan
-3. Problem Statement
-4. Solusi yang Diusulkan
-5. Rumusan Masalah
-6. Penjelasan Struktur Tree dan Algoritma
-7. Penjelasan Method per Method
-8. Algoritma
-9. Diagram / Visualisasi
-10. Aplikasi / Implementasi
-11. Keunggulan
-12. Kekurangan
-13. Perbandingan antara Tree Dasar dan Modifikasi secara Teori
-14. Analisis Kompleksitas Berdasarkan Struktur Tree
-15. Potensi Pengembangan ke Depan
-16. Hasil Implementasi
-17. Perbandingan Performa Real
-18. Analisis Benchmark
-19. Diagram Implementasi Quadtree
-20. Source Code
-21. Referensi Paper
+- [Kelompok 7](#kelompok-7)
+- [Struktur Laporan](#struktur-laporan)
+- [Problem Statement](#problem-statement)
+- [Solusi yang Diusulkan](#solusi-yang-diusulkan)
+- [Rumusan Masalah](#rumusan-masalah)
+- [Penjelasan Struktur Tree dan Algoritma](#penjelasan-struktur-tree-dan-algoritma)
+  - [PR Quadtree](#pr-quadtree)
+  - [Quadtree](#quadtree)
+- [Diagram / Visualisasi](#diagram--visualisasi)
+  - [Spatial Subdivision Quadtree](#spatial-subdivision-quadtree)
+  - [Struktur Pohon (Tree Structure)](#struktur-pohon-tree-structure)
+  - [Nearest Neighbor Search + Pruning](#nearest-neighbor-search--pruning)
+  - [Delete + Node Merge](#delete--node-merge)
+- [Hasil Implementasi](#hasil-implementasi)
+  - [Screenshot Output Quadtree](#screenshot-output-quadtree)
+  - [Screenshot Output PR Quadtree](#screenshot-output-pr-quadtree)
+- [Perbandingan Performa Real](#perbandingan-performa-real)
+  - [Tabel Benchmark dari `pr quadtree/Main.java`](#tabel-benchmark-dari-pr-quadtreemainjava)
+  - [Tabel Nodes Visited dari `pr quadtree/Main.java`](#tabel-nodes-visited-dari-pr-quadtreemainjava)
+- [Analisis Benchmark](#analisis-benchmark)
+- [Source Code](#source-code)
+  - [Quadtree](#quadtree-1)
+  - [PR Quadtree](#pr-quadtree-1)
+- [Referensi Paper](#referensi-paper)
 
 ---
-
 ## Kelompok 7
 
 | No | NRP | Nama |
