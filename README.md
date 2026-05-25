@@ -29,8 +29,9 @@
 9. [Potensi Pengembangan ke Depan](#9-potensi-pengembangan-ke-depan)
 10. [Hasil Implementasi](#10-hasil-implementasi)
 11. [Perbandingan Performa Real](#11-perbandingan-performa-real)
-12. [Source Code](#12-source-code)
-13. [Referensi Paper](#13-referensi-paper)
+12. [Kelebihan dan Kekurangan Program Quadtree Smart Parking](#12-kelebihan-dan-kekurangan-program-quadtree-smart-parking)
+13. [Source Code](#13-source-code)
+14. [Referensi Paper](#14-referensi-paper)
 
 ---
 
@@ -382,7 +383,42 @@ Berdasarkan benchmark:
 
 ---
 
-# 12. Source Code
+# 12. Kelebihan dan Kekurangan Program Quadtree Smart Parking
+## Kelebihan
+
+**1. Subdivisi Otomatis dan Adaptif**
+Node hanya dibagi ketika kapasitas terlampaui — tidak membuang memori untuk area kosong. Struktur tree menyesuaikan diri secara dinamis sesuai distribusi data slot parkir.
+
+**2. Pruning pada `query()`**
+Sudah ada pengecekan `boundary.intersects(range)` sebelum masuk ke subtree, sehingga node yang tidak relevan langsung dilewati tanpa diperiksa isinya. Ini adalah keunggulan utama dibanding pendekatan brute force O(n).
+
+**3. Implementasi Bersih dan Mudah Dibaca**
+Struktur kode sederhana dengan tanggung jawab yang jelas per method. Cocok sebagai baseline implementasi quadtree dan mudah dikembangkan lebih lanjut.
+
+**4. Kapasitas Fleksibel via Parameter `capacity`**
+Kapasitas per node dapat diatur dari luar saat inisialisasi, sehingga dapat di-tune sesuai kebutuhan ukuran dataset tanpa mengubah logika internal.
+
+---
+
+## Kekurangan
+
+**1. `nearest()` Tidak Ada Pruning Bounding Box**
+Semua child dikunjungi tanpa pengecekan apakah jarak minimum bounding box ke target sudah lebih besar dari `bestDist` saat ini. Akibatnya kompleksitas praktis mendekati O(n) meski tree sudah dalam, karena tidak ada cabang yang dipangkas.
+
+**2. Slot Lama Tidak Diredistribusi Saat `subdivide()`**
+Ketika sebuah node melakukan subdivisi, slot yang sudah tersimpan di node tersebut tetap berada di parent — tidak dipindahkan ke child yang sesuai. Hal ini menyebabkan distribusi data tidak merata dan mengurangi efektivitas pruning pada operasi `query()`.
+
+**3. Tidak Ada `updateStatus()` dan `isOccupied`**
+Program tidak membedakan slot kosong dan slot terisi. Padahal untuk sistem Smart Parking, ini adalah fitur inti — seharusnya `nearest()` hanya mengembalikan slot dengan status `isOccupied = false`, bukan sembarang slot terdekat.
+
+**4. Tidak Ada `nodesVisited` Counter**
+Tidak tersedia metrik untuk mengukur efisiensi traversal secara kuantitatif. Tanpa counter ini, perbandingan performa antara Quadtree biasa dan PR Quadtree tidak dapat dilakukan secara objektif.
+
+**5. Bug Potensial pada `nearest()` — `bestDist` Tidak Terpropagasi dengan Benar**
+Variabel `bestDist` di-pass by value ke setiap pemanggilan rekursif. Akibatnya, pembaruan `bestDist` di dalam satu cabang rekursi tidak otomatis memperbarui nilai di cabang sejajar berikutnya. Ini dapat menyebabkan `nearest()` mengembalikan hasil yang tidak selalu merupakan titik terdekat yang sesungguhnya pada kasus tertentu.
+
+
+# 13. Source Code
 
 | File                            | Deskripsi                            |
 | ------------------------------- | ------------------------------------ |
@@ -424,7 +460,7 @@ Strukdat-K7-Eksplorasi-Tree-Tugas-3/
 
 ---
 
-# 13. Referensi Paper
+# 14. Referensi Paper
 
 D'Angelo, A. (2016). A Brief Introduction to Quadtrees and Their Applications. School of Computer Science, Carleton University. Diakses dari: https://people.scs.carleton.ca/~maheshwa/courses/5703COMP/16Fall/quadtrees-paper.pdf
 
