@@ -216,6 +216,8 @@ Pada proses delete operation, PR Quadtree berhasil mengurangi jumlah node secara
 
 # Referensi Paper
 
-1. A Brief Introduction to Quadtrees and Their Applications
+1. [A Brief Introduction to Quadtrees and Their Applications](paper/1-s2.0-S2095756421001033-main.pdf)
+   * Link: [ScienceDirect](https://www.sciencedirect.com/science/article/pii/S2095756421001033?via%3Dihub)
 
-2. A Dynamic Balanced Quadtree for Real-Time Streaming Data (2023)
+2. [A Dynamic Balanced Quadtree for Real-Time Streaming Data (2023)](paper/quadtrees-paper.pdf)
+   * Link: [ScienceDirect](https://www.sciencedirect.com/science/article/pii/S0950705123000412)
