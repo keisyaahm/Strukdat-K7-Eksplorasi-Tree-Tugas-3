@@ -480,5 +480,3 @@ Quadtree dan PR Quadtree merupakan struktur data spasial yang efektif untuk sist
 Standard Quadtree unggul pada implementasi sederhana dan insert yang lebih cepat, sedangkan PR Quadtree unggul pada pengelolaan data dinamis melalui node merging dan pruning yang lebih efisien.
 
 Dalam konteks sistem parkir ITS yang memiliki perubahan status slot secara real-time, PR Quadtree lebih sesuai digunakan karena mampu menjaga struktur tree tetap efisien meskipun terjadi banyak operasi insert dan delete.
-
-```
