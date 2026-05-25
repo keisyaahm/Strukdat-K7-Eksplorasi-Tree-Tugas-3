@@ -2,35 +2,9 @@
 
 # Implementasi Quadtree dan PR Quadtree untuk Navigasi Pencarian Slot Parkir Terdekat pada Sistem Smart Parking
 
-# Daftar Isi
-
-- [Kelompok 7](#kelompok-7)
-- [Struktur Laporan](#struktur-laporan)
-- [Problem Statement](#problem-statement)
-- [Solusi yang Diusulkan](#solusi-yang-diusulkan)
-- [Rumusan Masalah](#rumusan-masalah)
-- [Penjelasan Struktur Tree dan Algoritma](#penjelasan-struktur-tree-dan-algoritma)
-  - [PR Quadtree](#pr-quadtree)
-  - [Quadtree](#quadtree)
-- [Diagram / Visualisasi](#diagram--visualisasi)
-  - [Spatial Subdivision Quadtree](#spatial-subdivision-quadtree)
-  - [Struktur Pohon (Tree Structure)](#struktur-pohon-tree-structure)
-  - [Nearest Neighbor Search + Pruning](#nearest-neighbor-search--pruning)
-  - [Delete + Node Merge](#delete--node-merge)
-- [Hasil Implementasi](#hasil-implementasi)
-  - [Screenshot Output Quadtree](#screenshot-output-quadtree)
-  - [Screenshot Output PR Quadtree](#screenshot-output-pr-quadtree)
-- [Perbandingan Performa Real](#perbandingan-performa-real)
-  - [Tabel Benchmark dari `pr quadtree/Main.java`](#tabel-benchmark-dari-pr-quadtreemainjava)
-  - [Tabel Nodes Visited dari `pr quadtree/Main.java`](#tabel-nodes-visited-dari-pr-quadtreemainjava)
-- [Analisis Benchmark](#analisis-benchmark)
-- [Source Code](#source-code)
-  - [Quadtree](#quadtree-1)
-  - [PR Quadtree](#pr-quadtree-1)
-- [Referensi Paper](#referensi-paper)
-
 ---
-## Kelompok 7
+
+# Kelompok 7
 
 | No | NRP | Nama |
 |---|---|---|
@@ -42,78 +16,151 @@
 
 ---
 
-# Struktur Laporan
+# Daftar Isi
 
-1. Problem statement / permasalahan
-2. Penjelasan struktur tree dan algoritma
-3. Diagram / visualisasi
-4. Aplikasi / implementasinya
-5. Keunggulan
-6. Kekurangan
-7. Perbandingan antara tree dasar dan modifikasi secara teori
-8. Analisis kompleksitas berdasarkan struktur tree
-9. Potensi pengembangan ke depan
-10. Hasil Implementasi
-11. Perbandingan performa real
+1. [Problem Statement](#1-problem-statement)
+2. [Penjelasan Struktur Tree dan Algoritma](#2-penjelasan-struktur-tree-dan-algoritma)
+3. [Diagram dan Visualisasi](#3-diagram-dan-visualisasi)
+4. [Aplikasi dan Implementasi](#4-aplikasi-dan-implementasi)
+5. [Keunggulan](#5-keunggulan)
+6. [Kekurangan](#6-kekurangan)
+7. [Perbandingan antara Tree Dasar dan Variasi Modifikasi](#7-perbandingan-antara-tree-dasar-dan-variasi-modifikasi)
+8. [Analisis Kompleksitas Berdasarkan Struktur Tree](#8-analisis-kompleksitas-berdasarkan-struktur-tree)
+9. [Potensi Pengembangan ke Depan](#9-potensi-pengembangan-ke-depan)
+10. [Hasil Implementasi](#10-hasil-implementasi)
+11. [Perbandingan Performa Real](#11-perbandingan-performa-real)
+12. [Source Code](#12-source-code)
+13. [Referensi Paper](#13-referensi-paper)
 
 ---
 
-# Problem Statement
+# 1. Problem Statement
 
 Setiap hari, kawasan perkuliahan Institut Teknologi Sepuluh Nopember (ITS) khususnya di sekitar Tower 1 dipadati ribuan kendaraan mahasiswa. Dua titik parkir yang paling sering menjadi rebutan adalah parkiran FASOR dan parkiran KPA dekat TW 1. Sayangnya, kondisi di lapangan sering menyulitkan mahasiswa yang ingin parkir, terutama saat pergantian jam kuliah ataupun rush hour.
 
-Pertama, soal kapasitas. Parkiran FASOR dan KPA memiliki area yang luas, tetapi mahasiswa yang baru masuk hanya bisa melihat kondisi bagian depan. Ketika area depan sudah penuh, banyak mahasiswa langsung berasumsi bahwa seluruh parkiran sudah tidak bisa digunakan dan akhirnya memutar balik menuju parkiran lainnya yang jauh lebih jauh dari gedung TW 1. Padahal, kalau diteruskan masuk, bagian belakang FASOR masih sering memiliki banyak slot yang kosong hanya saja tidak terlihat dari depan.
+Permasalahan pertama adalah keterbatasan visibilitas area parkir. Mahasiswa yang baru masuk ke FASOR hanya dapat melihat kondisi area depan. Ketika area depan terlihat penuh, sebagian besar mahasiswa langsung menganggap seluruh area parkir sudah tidak tersedia dan memilih berpindah ke parkiran lain yang lebih jauh. Padahal, area belakang FASOR sering kali masih memiliki banyak slot kosong yang tidak terlihat dari pintu masuk.
 
-Kedua, soal keakuratan dari kapasitas. Melihat parkiran lalu menganalisis dengan mata kosong tidak selalu efektif, masalahnya, motor yang diparkir tidak selalu rapi. Sering kali ada slot/tempat yang hitungan kapasitas masih bisa digunakan, tapi secara kondisi aslinya hanya menyisakan celah setengah motor dan tidak bisa lagi diisi. Artinya, sistem tidak bisa bergantung pada rata-rata kapasitas parkiran, melainkan harus mengandalkan titik koordinat spasial (X,Y)(X, Y) (X,Y) dari slot/tempat yang benar-benar bisa digunakan.
+Permasalahan kedua adalah ketidakakuratan estimasi kapasitas parkir. Motor yang diparkir tidak selalu rapi sehingga terdapat slot yang secara teoritis masih tersedia, namun secara fisik tidak dapat digunakan karena hanya menyisakan ruang sempit. Oleh karena itu, sistem tidak dapat hanya mengandalkan perhitungan kapasitas rata-rata, tetapi harus memanfaatkan representasi spasial berupa titik koordinat `(x, y)` dari slot parkir yang benar-benar valid.
 
-Ketiga, soal beban komputasi pencarian (saat mencari data). Untuk membangun sistem smart parking yang bisa menavigasi mahasiswa ke slot kosong terdekat secara real-time, sistem harus memproses ratusan hingga ribuan titik koordinat dalam hitungan detik. Jika pendekatannya adalah linear search yaitu mengecek slot satu per satu dari ujung FASOR sampai ke parkiran ujung KPA maupun Elektro kompleksitasnya adalah O(N)O(N) O(N). Ini tidak masalah jika skala kecil, tetapi ketika sistem diakses ratusan bahkan ribuan pengguna sekaligus di jam pergantian kelas maupun rush hour, waktu respons akan melambat secara drastis dan membebani server.
+Permasalahan ketiga adalah beban komputasi pencarian slot kosong. Sistem smart parking yang bekerja secara real-time harus mampu memproses ratusan hingga ribuan titik koordinat dalam waktu singkat. Jika menggunakan pendekatan linear search, sistem harus memeriksa slot satu per satu dengan kompleksitas `O(N)`. Pada kondisi padat pengguna seperti pergantian jam kuliah, pendekatan ini dapat memperlambat waktu respons sistem secara signifikan.
 
----
+## Solusi yang Diusulkan
 
-# Solusi yang Diusulkan
+Untuk mengatasi permasalahan tersebut, digunakan struktur data spasial **Quadtree** dan variasinya yaitu **PR Quadtree (Point Region Quadtree)**. Struktur ini membagi area parkir menjadi empat wilayah (kuadran) secara hierarkis sehingga pencarian slot kosong dapat dilakukan lebih efisien.
 
-Untuk mengatasi masalah tersebut, kami menerapkan struktur data spasial Quadtree dan variasinya, PR (Point Region) Quadtree guna memetakan seluruh area parkir ITS ke dalam ruang dua dimensi. Berbeda dengan metode konvensional yang memeriksa slot/tempat parkir satu per satu, sistem ini membagi area parkir secara hierarkis menjadi empat wilayah (kuadran). Jika suatu wilayah seperti area depan FASOR sudah penuh dan tidak ada satupun titik slot/tempat kosong di sana, kuadran tersebut tidak menyimpan titik apapun, sehingga algoritma Nearest Neighbor Search akan langsung mengabaikan wilayah tersebut (pruning). Kemudian secara otomatis mengarahkan navigasi pencarian ke wilayah kuadran lain yang masih memiliki slot/tempat kosong, seperti area belakang FASOR, KPA, Manarul, CCWS maupun parkiran Teknik Elektro. Hasilnya hal ini berhasil memangkas kompleksitas waktu pencarian secara signifikan dari O(N)O(N) O(N) menjadi O(log⁡N)O(\log N) O(logN).
+Jika suatu area sudah penuh dan tidak memiliki slot kosong, maka seluruh region dapat langsung diabaikan melalui teknik **pruning** tanpa perlu memeriksa seluruh titik di dalamnya. Dengan pendekatan ini, pencarian slot kosong terdekat dapat dilakukan lebih cepat dibandingkan linear search dan mendekati kompleksitas `O(log N)` pada distribusi data yang baik.
 
----
+## Rumusan Masalah
 
-# Rumusan Masalah
-
-1. Bagaimana merepresentasikan posisi slot/tempat parkir yang valid dan kosong di area FASOR, KPA, Manarul, CCWS maupun parkiran Teknik Elektro, dll secara spasial menggunakan struktur data Quadtree?
-
-2. Bagaimana PR Quadtree dapat mengatasi ketidakakuratan pendeteksian slot dan mempercepat pencarian slot kosong terdekat dibandingkan Quadtree standar?
-
-3. Seberapa besar perbedaan performa dari sisi waktu eksekusi query dan jumlah node yang diperiksa antara Quadtree dan PR Quadtree pada berbagai tingkat kepadatan area parkir?
+1. Bagaimana merepresentasikan slot parkir menggunakan struktur data spasial Quadtree?
+2. Bagaimana PR Quadtree meningkatkan efisiensi pencarian dibandingkan Quadtree standar?
+3. Bagaimana perbandingan performa Quadtree dan PR Quadtree dalam operasi pencarian, range query, dan delete?
 
 ---
 
-# Penjelasan Struktur Tree dan Algoritma
+# 2. Penjelasan Struktur Tree dan Algoritma
 
-## PR Quadtree
+## 2.1 Quadtree (Tree Dasar)
 
-Point-Region Quadtree (PR Quadtree) merupakan struktur data spasial yang digunakan untuk menyimpan data berupa titik pada ruang dua dimensi. Struktur ini bekerja dengan cara membagi suatu area menjadi empat bagian yang sama besar secara berulang hingga jumlah titik dalam setiap bagian tidak melebihi batas kapasitas yang telah ditentukan.
+Quadtree adalah struktur data hierarkis yang membagi ruang dua dimensi menjadi empat kuadran:
 
-Setiap node pada PR Quadtree merepresentasikan sebuah region atau wilayah tertentu. Ketika jumlah titik dalam region tersebut sudah melebihi kapasitas, maka region akan dibagi menjadi empat subregion yakni North-West (NW), North-East (NE), South-West (SW), dan South-East (SE). Setelah pembagian dilakukan, titik-titik yang ada akan ditempatkan kembali sesuai posisi koordinatnya masing-masing.
+- North West (NW)
+- North East (NE)
+- South West (SW)
+- South East (SE)
 
-Perbedaannya dengan struktur data linear adalah PR Quadtree menyimpan data berdasarkan lokasi spesialnya. Node internal hanya berfungsi sebagai pembagi ruang sedangkan data titik disimpan pada leaf. Pendekatan ini membuat proses pencarian data berdasarkan posisi menjadi lebih terstruktur dan efisien.
+Setiap node dapat menyimpan beberapa titik hingga batas kapasitas tertentu (`CAPACITY`). Jika kapasitas terlampaui, node akan melakukan subdivisi menjadi empat child node.
 
-Quadtree biasa sering digunakan untuk merepresentasikan pembagian area berdasarkan keseragaman nilai suatu region. Pada pendekatan ini, sebuah region akan dibagi apabila isi di dalamnya tidak homogen. Quadtree kerap diimplementasikan pada image compression atau computer graphics. Sedangkan, PR Quadtree dirancang khusus untuk data berbentuk titik. Pembagian region dilakukan bukan karena perbedaan karakteristik area, melainkan karena jumlah titik suatu region telah melewati batas kapasitas. Hal ini membuat PR Quadtree cocok digunakan untuk data koordinat seperti GPS dan lokasi kendaraan.
+### Karakteristik Quadtree
 
-PR Quadtree lebih efisien untuk pengolahan data titik karena proses pencariannya yang tidak memerlukan pemeriksaan seluruh data secara satu per satu. Proses kerja dari PR Quadtree cukup hanya menelusuri region yang relevan berdasarkan koordinat yang dicari. PR Quadtree juga membagi region yang memiliki banyak titik namun area kosong tidak akan terus dipecah sehingga penggunaan memori menjadi lebih hemat.
-
----
-
-## Quadtree
-
-Quadtree adalah struktur data hierarkis yang membagi ruang 2D secara rekursif menjadi empat kuadran (NW, NE, SW, SE). Dalam konteks Smart Parking, setiap node menyimpan kumpulan ParkingSlot hingga batas kapasitas (CAPACITY). Ketika kapasitas terlampaui, node tersebut melakukan subdivisi menjadi 4 child node dan mendistribusikan ulang slot-slot yang ada ke child yang sesuai berdasarkan koordinat.
-
-### Karakteristik utama:
-- Setiap node bisa menyimpan N slot sekaligus (threshold CAPACITY)
-- Subdivisi dipicu oleh jumlah data, bukan posisi data
-- Cell hasil subdivisi berbentuk persegi panjang, ukuran bergantung boundary parent
+- Menggunakan bucket capacity
+- Satu node dapat menyimpan banyak titik
+- Subdivide dipicu karena kapasitas penuh
+- Struktur relatif lebih dangkal
+- Cocok untuk data spasial statis
 
 ---
 
-# Diagram / Visualisasi
+## 2.2 PR Quadtree (Variasi Modifikasi)
+
+PR Quadtree merupakan variasi Quadtree yang dirancang khusus untuk data titik (`point data`). Setiap leaf node hanya menyimpan satu titik.
+
+Node pada PR Quadtree terdiri dari tiga tipe:
+
+| Node Type | Deskripsi |
+|---|---|
+| EMPTY | Region kosong |
+| LEAF | Menyimpan satu titik |
+| INTERNAL | Sudah subdivide |
+
+### Karakteristik PR Quadtree
+
+- Satu leaf hanya menyimpan satu titik
+- Subdivide terjadi saat collision point
+- Mendukung node merging
+- Lebih adaptif untuk data dinamis
+- Cocok untuk sistem real-time
+
+---
+
+## Algoritma Insert pada Quadtree
+
+```text
+INSERT(node, point):
+    if point berada di luar boundary:
+        return false
+
+    if jumlah titik < capacity:
+        simpan point
+        return true
+
+    if node belum subdivide:
+        subdivide()
+
+    insert ke child yang sesuai
+````
+
+---
+
+## Algoritma Insert pada PR Quadtree
+
+```text
+INSERT(node, point):
+
+    if node EMPTY:
+        node menjadi LEAF
+        simpan point
+
+    else if node LEAF:
+        ubah menjadi INTERNAL
+        subdivide()
+        insert titik lama
+        insert titik baru
+
+    else:
+        insert recursively ke child
+```
+
+---
+
+## Algoritma Nearest Neighbor Search
+
+```text
+NEAREST(node, target):
+
+    cek distance ke boundary node
+
+    jika lebih buruk dari kandidat terbaik:
+        pruning subtree
+
+    cek point di node
+
+    traversal child terdekat lebih dulu
+```
+
+---
+
+# 3. Diagram dan Visualisasi
 
 ## Spatial Subdivision Quadtree
 
@@ -121,25 +168,142 @@ Quadtree adalah struktur data hierarkis yang membagi ruang 2D secara rekursif me
 
 ---
 
-## Struktur Pohon (Tree Structure)
+## Struktur Pohon Quadtree
 
-![Tree Structure](img/Diagram%20Struktur%20Pohon%20(Tree)%20untuk%20Subdivision%20di%20atas.svg)
+![Tree Structure](img/Diagram%20Struktur%20Pohon%20\(Tree\)%20untuk%20Subdivision%20di%20atas.svg)
 
 ---
 
 ## Nearest Neighbor Search + Pruning
 
-![Nearest Neighbor](img/Diagram%20Nearest%20Neighbor%20Search%20+%20Pruning%20(Parkiran%20FASOR).svg)
+![Nearest Neighbor](img/Diagram%20Nearest%20Neighbor%20Search%20+%20Pruning%20\(Parkiran%20FASOR\).svg)
 
 ---
 
 ## Delete + Node Merge
 
-![Delete Merge](img/Diagram%20Delete%20+%20Node%20Merge%20(Eksklusif%20PR%20Quadtree).svg)
+![Delete Merge](img/Diagram%20Delete%20+%20Node%20Merge%20\(Eksklusif%20PR%20Quadtree\).svg)
 
 ---
 
-# Hasil Implementasi
+# 4. Aplikasi dan Implementasi
+
+Implementasi dilakukan menggunakan bahasa Java untuk mensimulasikan sistem smart parking di kawasan ITS.
+
+Fitur utama yang diimplementasikan:
+
+* Insert slot parkir
+* Range Query
+* Nearest Neighbor Search
+* Update status slot
+* Delete node
+* Node merging pada PR Quadtree
+* Benchmark performa
+* Analisis jumlah node visited
+
+## Skenario Simulasi
+
+Sistem mensimulasikan area:
+
+* FASOR
+* KPA
+* Manarul
+* Teknik Elektro
+
+Setiap slot direpresentasikan sebagai koordinat `(x, y)` dengan status:
+
+* AVAILABLE
+* OCCUPIED
+
+---
+
+# 5. Keunggulan
+
+## Keunggulan Quadtree
+
+* Struktur lebih sederhana
+* Insert lebih cepat pada data normal
+* Kedalaman tree lebih rendah
+* Implementasi lebih mudah
+
+## Keunggulan PR Quadtree
+
+* Mendukung node merging otomatis
+* Lebih optimal untuk point data
+* Pruning lebih efisien
+* Lebih cocok untuk data dinamis
+* Struktur lebih adaptif terhadap distribusi titik
+
+---
+
+# 6. Kekurangan
+
+## Kekurangan Quadtree
+
+* Tidak mendukung merge node otomatis
+* Menyisakan phantom node setelah delete
+* Efisiensi query dapat menurun pada data dinamis
+
+## Kekurangan PR Quadtree
+
+* Insert lebih lambat
+* Struktur tree lebih dalam
+* Overhead rekursi lebih besar
+* Implementasi lebih kompleks
+
+---
+
+# 7. Perbandingan antara Tree Dasar dan Variasi Modifikasi
+
+| Aspek                     | Quadtree       | PR Quadtree     |
+| ------------------------- | -------------- | --------------- |
+| Jenis Data                | Bucket Region  | Point Data      |
+| Trigger Subdivide         | Capacity Full  | Collision Point |
+| Leaf Node                 | Banyak titik   | Satu titik      |
+| Delete                    | Tidak merge    | Merge otomatis  |
+| Struktur                  | Lebih dangkal  | Lebih dalam     |
+| Insert                    | Lebih cepat    | Lebih lambat    |
+| Query Dinamis             | Kurang optimal | Lebih optimal   |
+| Kompleksitas Implementasi | Rendah         | Lebih tinggi    |
+
+---
+
+# 8. Analisis Kompleksitas Berdasarkan Struktur Tree
+
+## Kompleksitas Waktu
+
+| Operasi          | Quadtree         | PR Quadtree      |
+| ---------------- | ---------------- | ---------------- |
+| Insert           | O(log N) average | O(log N) average |
+| Search           | O(log N) average | O(log N) average |
+| Delete           | O(log N)         | O(log N) + merge |
+| Range Query      | O(log N + k)     | O(log N + k)     |
+| Nearest Neighbor | O(log N) average | O(log N) average |
+
+## Kompleksitas Ruang
+
+| Struktur    | Kompleksitas |
+| ----------- | ------------ |
+| Quadtree    | O(N)         |
+| PR Quadtree | O(N)         |
+
+---
+
+# 9. Potensi Pengembangan ke Depan
+
+Pengembangan lanjutan yang dapat dilakukan:
+
+* Integrasi GPS real-time
+* Integrasi IoT Smart Parking
+* Visualisasi GUI interaktif
+* Dynamic Streaming Spatial Data
+* Implementasi Octree untuk 3D parking
+* Integrasi database dan cloud service
+* Prediksi slot menggunakan machine learning
+
+---
+
+# 10. Hasil Implementasi
 
 ## Screenshot Output Quadtree
 
@@ -153,71 +317,132 @@ Quadtree adalah struktur data hierarkis yang membagi ruang 2D secara rekursif me
 
 ---
 
-# Perbandingan Performa Real
+## Implementasi yang Berhasil Dibuat
 
-## Tabel Benchmark dari `pr quadtree/Main.java`
-
-### Judul:
-Perbandingan Performa Real PR Quadtree dan Standard Quadtree
-
-| N | Insert PR | Insert QT | Range Query PR | Range Query QT | Nearest PR | Nearest QT |
-|---|---|---|---|---|---|---|
-| 100 | 163.10 µs | 124.46 µs | 18.12 µs | 28.60 µs | 59.16 µs | 41.38 µs |
-| 1000 | 912.18 µs | 553.58 µs | 195.30 µs | 67.58 µs | 93.16 µs | 102.92 µs |
-| 10000 | 8977.64 µs | 5213.64 µs | 567.04 µs | 343.22 µs | 35.44 µs | 26.54 µs |
-
-µs = microseconds, karena output program membagi waktu dengan 1000.
+* Standard Quadtree
+* PR Quadtree
+* Spatial subdivision
+* Range query
+* Nearest neighbor search
+* Delete + node merging
+* Benchmark performance
+* Nodes visited analysis
 
 ---
 
-## Tabel Nodes Visited dari `pr quadtree/Main.java`
+# 11. Perbandingan Performa Real
 
-### Judul:
-Perbandingan Jumlah Node yang Dikunjungi saat Nearest Neighbor Search
+## Metodologi Benchmark
 
-| N | PR Nodes Visited | QT Nodes Visited |
-|---|---|---|
-| 100 | 41 | 33 |
-| 1000 | 65 | 57 |
-| 10000 | 95 | 85 |
+Benchmark dilakukan menggunakan:
 
-Ini menunjukkan efisiensi pruning: semakin sedikit node dikunjungi, semakin optimal nearest search.
+* Bahasa Java
+* JVM Warmup
+* Rata-rata 5 iterasi
+* Randomized coordinate dataset
+* Data size:
 
----
+  * 100
+  * 1000
+  * 10000
 
-# Analisis Benchmark
-
-Berdasarkan hasil benchmark, Standard Quadtree pada beberapa pengujian menunjukkan waktu eksekusi yang lebih cepat dibandingkan PR Quadtree. Hal ini terjadi karena implementasi PR Quadtree memiliki struktur subdivisi yang lebih detail dan jumlah node yang lebih banyak sehingga overhead rekursi menjadi lebih besar.
-
-Namun, PR Quadtree tetap memiliki keunggulan pada pengelolaan point data dan efisiensi struktur spasial. Hal ini terlihat pada kemampuan node merging serta representasi region yang lebih adaptif terhadap distribusi titik koordinat.
-
-Pada proses delete operation, PR Quadtree berhasil mengurangi jumlah node secara signifikan melalui mekanisme merge node otomatis, sedangkan Standard Quadtree tetap mempertahankan subdivision lama meskipun node sudah kosong.
+Satuan waktu menggunakan mikrodetik (`µs`).
 
 ---
 
-# Source Code
+## Benchmark Performa
 
-## Quadtree
-- Insert
-- Subdivide
-- Range Query
-- Nearest Neighbor
-- Update Status
-- Nodes Visited
-
-## PR Quadtree
-- Point Region Partitioning
-- Node Merge
-- Collision Split
-- Adaptive Search
-- Pruning Optimization
+| N     | Insert PR  | Insert QT  | Range Query PR | Range Query QT | Nearest PR | Nearest QT |
+| ----- | ---------- | ---------- | -------------- | -------------- | ---------- | ---------- |
+| 100   | 163.10 µs  | 124.46 µs  | 18.12 µs       | 28.60 µs       | 59.16 µs   | 41.38 µs   |
+| 1000  | 912.18 µs  | 553.58 µs  | 195.30 µs      | 67.58 µs       | 93.16 µs   | 102.92 µs  |
+| 10000 | 8977.64 µs | 5213.64 µs | 567.04 µs      | 343.22 µs      | 35.44 µs   | 26.54 µs   |
 
 ---
 
-# Referensi Paper
+## Nodes Visited
 
-1. [A Brief Introduction to Quadtrees and Their Applications](paper/1-s2.0-S2095756421001033-main.pdf)
-   * Link: [ScienceDirect](https://www.sciencedirect.com/science/article/pii/S2095756421001033?via%3Dihub)
+| N     | PR Nodes Visited | QT Nodes Visited |
+| ----- | ---------------- | ---------------- |
+| 100   | 41               | 33               |
+| 1000  | 65               | 57               |
+| 10000 | 95               | 85               |
 
-2. [A Dynamic Balanced Quadtree for Real-Time Streaming Data (2023)](paper/quadtrees-paper.pdf)
-   * Link: [ScienceDirect](https://www.sciencedirect.com/science/article/pii/S0950705123000412)
+---
+
+## Analisis Benchmark
+
+Berdasarkan benchmark:
+
+* Standard Quadtree memiliki insert lebih cepat karena menggunakan bucket capacity.
+* PR Quadtree memiliki overhead lebih besar akibat subdivisi per titik.
+* PR Quadtree unggul pada delete operation karena mendukung node merging.
+* Standard Quadtree tetap menyimpan phantom node setelah delete.
+* PR Quadtree lebih cocok untuk sistem parkir real-time dengan data dinamis.
+
+---
+
+# 12. Source Code
+
+| File                            | Deskripsi                            |
+| ------------------------------- | ------------------------------------ |
+| `src/QUADTREE/QuadTree.java`    | Implementasi Standard Quadtree       |
+| `src/QUADTREE/PRQuadTree.java`  | Implementasi PR Quadtree             |
+| `src/QUADTREE/Main.java`        | Benchmark dan simulasi Smart Parking |
+| `src/QUADTREE/ParkingSlot.java` | Representasi slot parkir             |
+| `src/QUADTREE/Rectangle.java`   | Boundary dan spatial region          |
+
+---
+
+# Struktur Folder
+
+```text
+Strukdat-K7-Eksplorasi-Tree-Tugas-3/
+│
+├── img/
+│   ├── quadtree.png
+│   ├── prquadtree.png
+│   ├── Diagram Spatial Subdivision Quadtree.svg
+│   ├── Diagram Struktur Pohon (Tree) untuk Subdivision di atas.svg
+│   ├── Diagram Nearest Neighbor Search + Pruning (Parkiran FASOR).svg
+│   └── Diagram Delete + Node Merge (Eksklusif PR Quadtree).svg
+│
+├── paper/
+│   ├── paper1.pdf
+│   └── paper2.pdf
+│
+├── src/
+│   └── QUADTREE/
+│       ├── Main.java
+│       ├── QuadTree.java
+│       ├── PRQuadTree.java
+│       ├── ParkingSlot.java
+│       └── Rectangle.java
+│
+└── README.md
+```
+
+---
+
+# 13. Referensi Paper
+
+D'Angelo, A. (2016). A Brief Introduction to Quadtrees and Their Applications. School of Computer Science, Carleton University. Diakses dari: https://people.scs.carleton.ca/~maheshwa/courses/5703COMP/16Fall/quadtrees-paper.pdf
+
+Paper ini membahas struktur Quadtree dasar beserta variasinya (Region, Point, PR Quadtree) dan aplikasinya pada spatial queries termasuk range query dan spherical region query.
+
+
+Yang, G., Wu, X., & Zhang, J. (2023). A dynamic balanced quadtree for real-time streaming data. Knowledge-Based Systems, 263, 110291. Elsevier. https://doi.org/10.1016/j.knosys.2023.110291
+
+Paper ini membahas masalah ketidakseimbangan PR Quadtree pada data streaming dan mengusulkan Dynamic Balanced Quadtree (DB-Quadtree) yang relevan dengan skenario parkir real-time di ITS.
+
+---
+
+# Kesimpulan
+
+Quadtree dan PR Quadtree merupakan struktur data spasial yang efektif untuk sistem smart parking berbasis koordinat dua dimensi.
+
+Standard Quadtree unggul pada implementasi sederhana dan insert yang lebih cepat, sedangkan PR Quadtree unggul pada pengelolaan data dinamis melalui node merging dan pruning yang lebih efisien.
+
+Dalam konteks sistem parkir ITS yang memiliki perubahan status slot secara real-time, PR Quadtree lebih sesuai digunakan karena mampu menjaga struktur tree tetap efisien meskipun terjadi banyak operasi insert dan delete.
+
+```
